@@ -4,6 +4,9 @@ from discord import app_commands
 import sqlite3
 import math
 import random
+import systemlogs
+
+logger = systemlogs.logging.getLogger("bot")
 
 class LevelSys(commands.Cog):
     def __init__(self, bot):
@@ -12,7 +15,10 @@ class LevelSys(commands.Cog):
 # Load Level Cog
     @commands.Cog.listener()
     async def on_ready(self):
-        print("Leveling system successfully loaded!")
+        try:
+            logger.info("Leveling module successfully loaded!")
+        except Exception as e:
+            logger.error("Leveling module failed to load:", {e})
 
     @commands.Cog.listener() # Listens for new messages to update member xp
     async def on_message(self, message: discord.message):
@@ -65,19 +71,20 @@ class LevelSys(commands.Cog):
         member_id = member.id
         guild_id = interaction.guild.id
         
-        connection = sqlite3.connect("./cogs/levels.db")
+        connection = sqlite3.connect("./src/cogs/levels.db")
         cursor = connection.cursor()
         cursor.execute("SELECT * FROM Users WHERE guild_id = ? AND user_id = ?", (guild_id, member_id))
         result = cursor.fetchone()
 
         if result is None:
-            await interaction.response.send_message(f"{member.name} is level 0.")
+            await interaction.response.send_message(f"**{member.name}**\n**Level:** 0\n**Current XP:** N/A\n**Next Level Up:** N/A\n*User has not chatted yet!*")
+
         else:
             level = result[2]
             xp = result[3]
             level_up_xp = result[4]
 
-            await interaction.response.send_message(f"{member.name} is level {level}, with {xp} xp.\n{level_up_xp} xp is needed to level up.")
+            await interaction.response.send_message(f"**{member.name}**\n**Level:** {level}\n**Current XP:** {xp}\n**Next Level Up:** {level_up_xp} XP")
 
         connection.close()
 

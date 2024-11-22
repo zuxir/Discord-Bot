@@ -2,6 +2,9 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 import asyncio
+import systemlogs
+
+logger = systemlogs.logging.getLogger("bot")
 
 class Mod(commands.Cog):
     def __init__(self, bot):
@@ -9,7 +12,10 @@ class Mod(commands.Cog):
     
     @commands.Cog.listener()
     async def on_ready(self):
-        print("Moderation commands successfully loaded!")
+        try:
+            logger.info("Moderation module successfully loaded!")
+        except Exception as e:
+            logger.error("Moderation module failed to load:", {e})
 
 # Clear / Purge Messages
     @app_commands.command(name="clear", description="Deletes a specified amount of messages from the channel.")
