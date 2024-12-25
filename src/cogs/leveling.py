@@ -62,7 +62,7 @@ class LevelSys(commands.Cog):
         connection.close()
 
 # Command to retrieve level data for a member and post a message in chat
-    @app_commands.command(name="level", description="Check a specified member's server level.")
+    @app_commands.command(name="level", description="Check a specific member's level.")
     async def level(self, interaction: discord.Interaction, member: discord.Member=None):
 
         if member is None:
@@ -76,6 +76,19 @@ class LevelSys(commands.Cog):
         cursor.execute("SELECT * FROM Users WHERE guild_id = ? AND user_id = ?", (guild_id, member_id))
         result = cursor.fetchone()
 
+        levelEmbed = discord.Embed(title=f"{member.name}'s Level",
+            colour=0x00b0f4,)
+
+        levelEmbed.add_field(name="Level:",
+                        value=level,
+                        inline=False)
+        levelEmbed.add_field(name="Current XP:",
+                        value=xp,
+                        inline=False)
+        levelEmbed.add_field(name="Next Level Up:",
+                        value=level_up_xp,
+                        inline=False)
+
         if result is None:
             await interaction.response.send_message(f"**{member.name}**\n**Level:** 0\n**Current XP:** N/A\n**Next Level Up:** N/A\n*User has not chatted yet!*")
 
@@ -84,7 +97,8 @@ class LevelSys(commands.Cog):
             xp = result[3]
             level_up_xp = result[4]
 
-            await interaction.response.send_message(f"**{member.name}**\n**Level:** {level}\n**Current XP:** {xp}\n**Next Level Up:** {level_up_xp} XP")
+            # await interaction.response.send_message(f"**{member.name}**\n**Level:** {level}\n**Current XP:** {xp}\n**Next Level Up:** {level_up_xp} XP")
+            await interaction.response.send_message(embed=levelEmbed)
 
         connection.close()
 
