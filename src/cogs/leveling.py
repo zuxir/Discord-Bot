@@ -77,10 +77,10 @@ class LevelSys(commands.Cog):
         result = cursor.fetchone()
 
         if result is None:
-            await interaction.response.send_message(f"**{member.name}**\n**Level:** 0\n**Current XP:** N/A\n**Next Level Up:** N/A\n*User has not chatted yet!*")
+            await interaction.response.send_message(f"**{member.name}**\n*User has not chatted yet!*")
 
         else:
-            level = result[2]
+            current_level = result[2]
             xp = result[3]
             level_up_xp = result[4]
 
@@ -90,11 +90,11 @@ class LevelSys(commands.Cog):
         levelEmbed.set_author(name=member, icon_url=member.avatar.url)
 
         levelEmbed.add_field(name="Level:",
-                        value=level,
-                        inline=False)
+                        value=current_level,
+                        inline=True)
         levelEmbed.add_field(name="XP:",
                         value=f"{xp}/{level_up_xp}",
-                        inline=False)
+                        inline=True)
         await interaction.response.send_message(embed=levelEmbed)
 
         connection.close()
