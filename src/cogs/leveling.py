@@ -25,7 +25,7 @@ class LevelSys(commands.Cog):
         if message.author.bot:
             return
         # Opens connection if member is NOT a bot
-        connection = sqlite3.connect("./cogs/levels.db")
+        connection = sqlite3.connect("./src/databases/levels.db")
         cursor = connection.cursor()
         guild_id = message.guild.id
         user_id = message.author.id
@@ -71,23 +71,10 @@ class LevelSys(commands.Cog):
         member_id = member.id
         guild_id = interaction.guild.id
         
-        connection = sqlite3.connect("./src/cogs/levels.db")
+        connection = sqlite3.connect("./src/databases/levels.db")
         cursor = connection.cursor()
         cursor.execute("SELECT * FROM Users WHERE guild_id = ? AND user_id = ?", (guild_id, member_id))
         result = cursor.fetchone()
-
-        levelEmbed = discord.Embed(title=f"{member.name}'s Level",
-            colour=0x00b0f4,)
-
-        levelEmbed.add_field(name="Level:",
-                        value=level,
-                        inline=False)
-        levelEmbed.add_field(name="Current XP:",
-                        value=xp,
-                        inline=False)
-        levelEmbed.add_field(name="Next Level Up:",
-                        value=level_up_xp,
-                        inline=False)
 
         if result is None:
             await interaction.response.send_message(f"**{member.name}**\n**Level:** 0\n**Current XP:** N/A\n**Next Level Up:** N/A\n*User has not chatted yet!*")
@@ -97,8 +84,18 @@ class LevelSys(commands.Cog):
             xp = result[3]
             level_up_xp = result[4]
 
-            # await interaction.response.send_message(f"**{member.name}**\n**Level:** {level}\n**Current XP:** {xp}\n**Next Level Up:** {level_up_xp} XP")
-            await interaction.response.send_message(embed=levelEmbed)
+        #Embed Setup
+        levelEmbed = discord.Embed(colour=0x00b0f4,)
+
+        levelEmbed.set_author(name=member, icon_url=member.avatar.url)
+
+        levelEmbed.add_field(name="Level:",
+                        value=level,
+                        inline=False)
+        levelEmbed.add_field(name="XP:",
+                        value=f"{xp}/{level_up_xp}",
+                        inline=False)
+        await interaction.response.send_message(embed=levelEmbed)
 
         connection.close()
 
