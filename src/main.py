@@ -18,21 +18,12 @@ bot = commands.Bot(command_prefix="!", intents=discord.Intents.all())
 @bot.event
 async def on_ready():
     logger.info(f"Bot is online as User: {bot.user} (ID: {bot.user.id})!")
-    guild_count = len(bot.guilds)
-    activity = discord.Activity(type=discord.ActivityType.watching, name=f"over {guild_count} servers")
-    await bot.change_presence(activity=activity)
+    await bot.change_presence(activity=discord.CustomActivity(name="Coming Soon! 😉",))
     try:
         synced_commands = await bot.tree.sync()
         logger.info(f"Synced {len(synced_commands)} commands!")
     except Exception as e:
         logger.error(f"Error syncing application commands: ", e)
-
-# Refreshes activity presence for servers watched
-@tasks.loop(hours=1)
-async def update_status():
-    guild_count = len(bot.guilds)
-    activity = discord.Activity(type=discord.ActivityType.watching, name=f"over {guild_count} servers")
-    await bot.change_presence(activity=activity)
 
 # Loads all cogs at each start
 async def load_cogs():
